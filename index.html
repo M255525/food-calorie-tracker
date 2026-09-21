@@ -147,8 +147,10 @@
     <label>拍照或選擇照片</label>
     <div class="capture-row">
       <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none;">
-      <button type="button" class="btn secondary" id="pickFileBtn">📁 拍照 / 選擇照片</button>
-      <button type="button" class="btn secondary" id="toggleCameraBtn">📷 使用電腦鏡頭</button>
+      <input type="file" id="fileInputGallery" accept="image/*" style="display:none;">
+      <button type="button" class="btn secondary" id="pickFileBtn">📷 拍照</button>
+      <button type="button" class="btn secondary" id="pickGalleryBtn">📁 從資料夾/相簿選擇</button>
+      <button type="button" class="btn secondary" id="toggleCameraBtn">🖥️ 使用電腦鏡頭</button>
     </div>
 
     <div id="cameraPanel">
@@ -678,6 +680,7 @@
     $("imagePreview").src = "";
     $("noteInput").value = "";
     $("fileInput").value = "";
+    $("fileInputGallery").value = "";
     $("itemsTbody").innerHTML = "";
     $("itemsEditor").classList.remove("show");
     clearReport();
@@ -1006,7 +1009,8 @@
   /* ================= 綁定事件 ================= */
   function bindEvents(){
     $("pickFileBtn").addEventListener("click", function(){ $("fileInput").click(); });
-    $("fileInput").addEventListener("change", async function(){
+    $("pickGalleryBtn").addEventListener("click", function(){ $("fileInputGallery").click(); });
+    async function onPickedFile(){
       var file = this.files && this.files[0];
       if(!file) return;
       try{
@@ -1014,7 +1018,9 @@
         setCurrentImage(dataUrl);
         clearReport();
       }catch(e){ notify("圖片讀取失敗：" + e.message); }
-    });
+    }
+    $("fileInput").addEventListener("change", onPickedFile);
+    $("fileInputGallery").addEventListener("change", onPickedFile);
 
     $("toggleCameraBtn").addEventListener("click", startCamera);
     $("closeCameraBtn").addEventListener("click", stopCamera);
