@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>操作手冊 · 拍照卡路里紀錄</title>
+<style>
+  :root{
+    --bg:#fdf7f0; --bg-alt:#f6ebdc; --panel:#ffffff; --panel-raised:#fffaf3;
+    --line:#e8d7bf; --line-soft:#f0e4d0; --text:#3a2b1f; --text-dim:#6b5844; --text-faint:#9c8a72;
+    --tomato:#c1502e; --sage:#5f8b6f; --red:#b8523c;
+    --font-sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#20160f; --bg-alt:#2a1e14; --panel:#2b1f16; --panel-raised:#32251a;
+      --line:#4a3826; --line-soft:#3c2d1f; --text:#f3e9db; --text-dim:#cbb89e; --text-faint:#96826a;
+      --tomato:#e37858; --sage:#8fbf9f; --red:#e08268;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.75;}
+  a{color:var(--tomato);}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;padding:16px 24px;flex-wrap:wrap;gap:10px;
+    border-bottom:1px solid var(--line-soft);background:var(--bg-alt);
+  }
+  .brand{display:flex;align-items:center;gap:8px;font-weight:700;}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--tomato);}
+  .topbar a.back{font-size:13px;color:var(--text-dim);text-decoration:none;border:1px solid var(--line);padding:7px 14px;border-radius:6px;}
+  .topbar a.back:hover{color:var(--tomato);border-color:var(--tomato);}
+  main{max-width:720px;margin:0 auto;padding:44px 24px 80px;}
+  h1{font-size:28px;margin:0 0 8px;}
+  .sub{color:var(--text-dim);margin:0 0 36px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin-bottom:20px;}
+  .card h2{font-size:18px;margin:0 0 14px;color:var(--tomato);}
+  .card p, .card li{color:var(--text-dim);font-size:14.5px;}
+  .card ul, .card ol{padding-left:20px;margin:8px 0;}
+  .tip{background:rgba(95,139,111,0.12);border:1px solid rgba(95,139,111,0.3);border-radius:8px;padding:12px 16px;font-size:13.5px;color:var(--text-dim);margin-top:12px;}
+  .warn{background:rgba(184,82,60,0.1);border:1px solid rgba(184,82,60,0.3);border-radius:8px;padding:14px 16px;font-size:13.5px;color:var(--text-dim);}
+  .warn strong{color:var(--red);}
+  footer{border-top:1px solid var(--line-soft);background:var(--bg-alt);padding:24px;text-align:center;font-size:12.5px;color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span><span>🍽️ 拍照卡路里紀錄</span></div>
+  <a class="back" href="index.html">← 回到工具</a>
+</div>
+
+<main>
+  <h1>操作手冊</h1>
+  <p class="sub">拍一張食物照片，AI 幫你辨識品項並估算卡路里，紀錄自動存在你自己的瀏覽器裡。</p>
+
+  <div class="card">
+    <h2>操作步驟</h2>
+    <ol>
+      <li>展開「⚙️ AI 連線設定」，選擇服務商並填入你自己的 API 金鑰（Claude、OpenAI、Gemini、OpenRouter 擇一，需選擇支援圖片辨識的模型）</li>
+      <li>按「📁 拍照 / 選擇照片」——手機會直接開啟相機，桌機則會開啟檔案選取視窗；桌機也可以改按「📷 使用電腦鏡頭」直接在網頁裡拍照</li>
+      <li>選填「補充說明」（例如份量、特殊食材），可以幫助 AI 估算更準確</li>
+      <li>按「🔍 AI 估算卡路里」，稍候幾秒後會出現可編輯的品項表格（食物名稱／份量／卡路里），可以直接修改任何欄位，也可以增刪項目</li>
+      <li>確認無誤後按「💾 儲存紀錄」，這筆紀錄就會存進「歷史紀錄」清單，並計入「今日總計」</li>
+    </ol>
+    <div class="tip">本工具沒有規則式的離線估算——AI 沒有金鑰無法運作，這是刻意的設計：估算食物卡路里需要真正的圖片辨識能力，沒有辦法用簡單規則猜測。</div>
+  </div>
+
+  <div class="card">
+    <h2>歷史紀錄與編輯</h2>
+    <p>「歷史紀錄」每一筆是一張卡片，點一下可以展開看完整品項明細與補充說明。每筆紀錄可以：</p>
+    <ul>
+      <li><strong>編輯：</strong>把這筆紀錄的照片與品項重新載入到上方的編輯區，修改後按「儲存紀錄」即可原地更新（不會變成新的一筆）</li>
+      <li><strong>刪除：</strong>永久移除這筆紀錄，無法復原</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>備份與匯出</h2>
+    <ul>
+      <li><strong>下載完整備份（.json）：</strong>把所有紀錄（含照片）匯出成一個檔案，換手機或清除瀏覽器資料前建議先備份</li>
+      <li><strong>匯入備份（.json）：</strong>選擇之前下載的備份檔即可還原，匯入是合併（依 id 覆蓋），不會刪除目前已有的其他紀錄</li>
+      <li><strong>下載 CSV（不含圖片）：</strong>把日期、品項、份量、卡路里整理成表格，方便匯入 Excel 自行分析</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>加入主畫面（可選）</h2>
+    <p>頁尾按「📲 加入主畫面」，可以把這個工具像 App 一樣安裝到手機或電腦桌面，吃飯時打開就能立刻拍照記錄。</p>
+    <ul>
+      <li><strong>Android（Chrome）／桌面 Chrome、Edge：</strong>按下按鈕會直接跳出安裝確認視窗</li>
+      <li><strong>iPhone／iPad（Safari）：</strong>按下按鈕會提示改用「分享」圖示 → 「加入主畫面」</li>
+      <li><strong>Mac 桌面版 Safari：</strong>會提示改用選單列「檔案」→「加入 Dock」（Safari 17 以上）</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>隱私說明</h2>
+    <ul>
+      <li>所有紀錄（含照片）只存在你自己瀏覽器的 IndexedDB，不會傳送到本工具的任何伺服器——因為本工具沒有伺服器</li>
+      <li>按下「AI 估算卡路里」時，照片與補充說明會直接從你的瀏覽器送到你自己選擇的 AI 服務商官方 API，不經過任何中間伺服器；API 金鑰也只存在瀏覽器的 localStorage</li>
+      <li>換裝置、換瀏覽器，或清除瀏覽器資料，紀錄都會遺失，請務必用「下載完整備份」定期存檔</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>使用警語</h2>
+    <div class="warn">
+      <strong>請注意：</strong>
+      <ul>
+        <li>AI 估算的卡路里僅供參考，並非精確的營養分析，實際熱量依食材、烹調方式、份量而有差異</li>
+        <li>請勿將本工具的估算結果作為醫療、疾病控制或飲食治療的唯一依據，有相關需求請諮詢專業營養師或醫師</li>
+        <li>請勿在照片或補充說明中包含他人的臉部、個資或其他敏感資訊</li>
+        <li>使用 AI 估算功能所產生的 API 費用由你與所選服務商的方案自行負擔，本工具不會向你收費</li>
+        <li>本工具與創作者不對使用估算結果後所產生之任何後果負責</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>創作者資料</h2>
+    <p><strong>Mark Tsai（蔡豐全）</strong></p>
+    <p>聯絡信箱：<a href="mailto:tsaimark@gmail.com">tsaimark@gmail.com</a></p>
+
+    <h3>專長</h3>
+    <p>銷售數據分析、AI 工具運用、政府補助計畫申請、創業、跨境電商</p>
+
+    <h3>證照</h3>
+    <ul>
+      <li>青創總會 創業輔導顧問師班（2013）</li>
+      <li>青創總會 網路行銷講師培訓班（2014）</li>
+      <li>阿里巴巴 P4P 認證講師（2016）</li>
+      <li>iCap 訓練規劃與評量職能基準課程（2017）</li>
+      <li>iCap 職能導向課程申請認證實作班（2023）</li>
+      <li>iPAS AI 應用規劃師－初級（2025）</li>
+      <li>新北市社會局社區數位陪伴員（2025）</li>
+    </ul>
+
+    <h3>經歷</h3>
+    <ul>
+      <li>勞動力發展署桃竹苗分署 創業顧問（2017－迄今）</li>
+      <li>勞動力發展署（北北基）小型企業人力提升計畫 顧問（2019－迄今）</li>
+      <li>勞動力發展署（桃竹苗）小型企業人力提升計畫 顧問（2019－迄今）</li>
+      <li>農業部農業科技司「科技農企業雙軸轉型躍升發展」科技計畫 業師（2025－2026）</li>
+      <li>勞動力發展署 企業人力資源提升計畫 審查委員（2024）</li>
+      <li>勞動力發展署 職前訓練評鑑計畫 委員（2022）</li>
+      <li>勞動部桃竹苗分署－桃竹苗區域運籌人力資源整合服務計畫 顧問（2022－2023）</li>
+      <li>經濟部中小企業處 SBIR 海選專案 評審委員（2019－2024）</li>
+      <li>勞動力發展署 數位學習課程清單審查會議 審查委員（2024－2025）</li>
+      <li>輔仁大學創新跨領域學院 課務委員（2024－2025）</li>
+      <li>台北市進出口商業同業公會 跨境電商生態村 顧問</li>
+      <li>台灣網商協會 顧問</li>
+      <li>中華職能開發策進會 顧問（2018－2020）</li>
+      <li>新北市汽車美容人員職業工會 顧問（2023－迄今）</li>
+      <li>中華網路行銷講師協會 顧問（2022－迄今）</li>
+      <li>新北市社企電商基地 輔導顧問（2018－2020）</li>
+      <li>阿里巴巴國際站平台 認證講師（2016）</li>
+      <li>巨匠電腦 跨境電子商務班 講師（2016－2017）</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>授權與使用限制</h2>
+    <p>本工具僅供<strong>教學、課程及個人使用</strong>，禁止未經授權公開發布、販售或商業化使用。如需其他用途，請先取得創作者授權。</p>
+  </div>
+
+</main>
+
+<footer>
+  製作：Mark Tsai｜<a href="index.html">回到工具</a>
+</footer>
+
+</body>
+</html>
