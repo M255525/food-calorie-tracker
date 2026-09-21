@@ -111,7 +111,8 @@
   .entry-actions{display:flex;gap:8px;margin-top:12px;}
   #emptyHistory{color:var(--text-faint);font-size:13.5px;text-align:center;padding:20px 0;}
   .backup-actions{display:flex;gap:10px;flex-wrap:wrap;}
-  .tip{background:var(--sage-soft);border:1px solid rgba(95,139,111,0.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--text-dim);margin-top:14px;}
+  .tip{background:var(--sage-soft);border:1px solid rgba(95,139,111,0.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--text-dim);margin-top:14px;white-space:pre-line;}
+  .analysis-result{background:var(--panel-raised);border:1px solid var(--line);border-radius:8px;padding:14px 16px;font-size:13.5px;color:var(--text-dim);white-space:pre-line;margin-top:14px;}
   .warn-box{background:rgba(184,82,60,0.1);border:1px solid rgba(184,82,60,0.3);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--text-dim);margin-top:14px;}
   .warn-box strong{color:var(--red);}
   footer.site-footer{border-top:1px solid var(--line-soft);background:var(--bg-alt);padding:24px;text-align:center;font-size:12.5px;color:var(--text-faint);}
@@ -212,6 +213,23 @@
     <h2>歷史紀錄</h2>
     <div id="entryList"></div>
     <div id="emptyHistory">還沒有任何紀錄，拍第一張照片開始記錄吧！</div>
+  </div>
+
+  <div class="card">
+    <h2>月份飲食分析與建議</h2>
+    <p class="card-sub">先由本工具統計你這個月的飲食數據（純本地計算，數字保證正確），再請 AI 依這些數據給出飲食狀況分析與具體建議。</p>
+    <div class="row">
+      <div>
+        <label>選擇月份</label>
+        <input type="month" id="analysisMonthInput">
+      </div>
+    </div>
+    <div class="capture-row" style="margin-top:10px;">
+      <button type="button" class="btn sage" id="genMonthAnalysisBtn">📊 產生本月分析與建議</button>
+    </div>
+    <div id="monthStatsBox" class="tip" style="display:none;"></div>
+    <div id="monthAnalysisReport" class="report-line"></div>
+    <div id="monthAnalysisResult" class="analysis-result" style="display:none;"></div>
   </div>
 
   <div class="card">
@@ -800,6 +818,123 @@
     $("todayCount").textContent = todayEntries.length;
   }
 
+  /* ================= 月份飲食分析與建議 ================= */
+  function monthKeyLocal(d){
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1);
+  }
+  // 統計數字完全在本地算出，不假手 AI——AI 只負責針對這些既定數字做質性分析與建議，
+  // 不會重新計算或臆測任何數值，避免「AI 自己編數字」的風險。
+  function computeMonthStats(entries, monthKey){
+    var filtered = entries.filter(function(e){ return e.dateKey.slice(0, 7) === monthKey; });
+    var byDay = {};
+    filtered.forEach(function(e){
+      byDay[e.dateKey] = (byDay[e.dateKey] || 0) + (e.totalCalories || 0);
+    });
+    var dayKeys = Object.keys(byDay);
+    var totalCalories = dayKeys.reduce(function(s, k){ return s + byDay[k]; }, 0);
+    var avgCaloriesPerLoggedDay = dayKeys.length ? Math.round(totalCalories / dayKeys.length) : 0;
+    var highestDayKey = null, lowestDayKey = null;
+    dayKeys.forEach(function(k){
+      if(highestDayKey === null || byDay[k] > byDay[highestDayKey]) highestDayKey = k;
+      if(lowestDayKey === null || byDay[k] < byDay[lowestDayKey]) lowestDayKey = k;
+    });
+    var freq = {};
+    filtered.forEach(function(e){
+      e.items.forEach(function(it){
+        var name = (it.name || "").trim();
+        if(!name) return;
+        freq[name] = (freq[name] || 0) + 1;
+      });
+    });
+    var topFoods = Object.keys(freq)
+      .map(function(k){ return {name:k, count:freq[k]}; })
+      .sort(function(a, b){ return b.count - a.count; })
+      .slice(0, 8);
+    return {
+      monthKey: monthKey,
+      entryCount: filtered.length,
+      daysLogged: dayKeys.length,
+      totalCalories: totalCalories,
+      avgCaloriesPerLoggedDay: avgCaloriesPerLoggedDay,
+      highestDay: highestDayKey ? {date:highestDayKey, calories:byDay[highestDayKey]} : null,
+      lowestDay: lowestDayKey ? {date:lowestDayKey, calories:byDay[lowestDayKey]} : null,
+      topFoods: topFoods
+    };
+  }
+  function renderMonthStatsBox(stats){
+    var box = $("monthStatsBox");
+    box.style.display = "block";
+    if(!stats.entryCount){
+      box.textContent = stats.monthKey + " 沒有任何紀錄，請先拍照記錄這個月的飲食再產生分析";
+      return false;
+    }
+    var lines = [];
+    lines.push("本月已記錄 " + stats.daysLogged + " 天、共 " + stats.entryCount + " 筆紀錄");
+    lines.push("總攝取 " + stats.totalCalories + " kcal，平均每個有記錄的日子 " + stats.avgCaloriesPerLoggedDay + " kcal");
+    if(stats.highestDay) lines.push("攝取最高的一天：" + stats.highestDay.date + "（" + stats.highestDay.calories + " kcal）");
+    if(stats.lowestDay) lines.push("攝取最低的一天：" + stats.lowestDay.date + "（" + stats.lowestDay.calories + " kcal）");
+    if(stats.topFoods.length) lines.push("最常出現的食物：" + stats.topFoods.map(function(f){ return f.name + "×" + f.count; }).join("、"));
+    box.textContent = lines.join("\n");
+    return true;
+  }
+  function buildMonthAnalysisPrompt(stats){
+    var lines = [];
+    lines.push("你是專業營養師。以下是使用者 " + stats.monthKey + "（年-月）的飲食紀錄統計數據，這些數字都是系統實際統計出來的，你不需要也不應該重新計算或臆測其他數字，只需要根據這些既定數據做質性分析：");
+    lines.push(JSON.stringify({
+      daysLogged: stats.daysLogged,
+      entryCount: stats.entryCount,
+      totalCalories: stats.totalCalories,
+      avgCaloriesPerLoggedDay: stats.avgCaloriesPerLoggedDay,
+      highestDay: stats.highestDay,
+      lowestDay: stats.lowestDay,
+      topFoods: stats.topFoods
+    }));
+    lines.push("請針對這個月份的飲食狀況做分析，並給予具體、可執行的飲食建議。");
+    lines.push("請分成「飲食狀況分析」與「飲食建議」兩個段落，每段 3-5 點條列，用純文字撰寫（不要使用 markdown 符號如 * # -），直接輸出可讀的內容，不要輸出 JSON。");
+    lines.push("這份分析僅供健康管理參考，不是醫療診斷；如果數據顯示明顯不均衡或異常，可以提醒使用者諮詢專業營養師或醫師，但不要用誇張或嚇唬的語氣。");
+    return lines.join("\n");
+  }
+  function setMonthReport(msg, kind){
+    var el = $("monthAnalysisReport");
+    el.textContent = msg;
+    el.className = "report-line show " + (kind || "");
+  }
+  async function onGenMonthAnalysis(){
+    var monthKey = $("analysisMonthInput").value;
+    if(!monthKey){ setMonthReport("請先選擇月份", "bad"); return; }
+    var creds = getAiCreds();
+    if(!creds.apiKey){ setMonthReport("請先在上方「AI 連線設定」填入 API 金鑰", "bad"); return; }
+    if(!creds.model){ setMonthReport("請填入模型名稱", "bad"); return; }
+    var entries = await dbListEntries();
+    var stats = computeMonthStats(entries, monthKey);
+    var hasData = renderMonthStatsBox(stats);
+    $("monthAnalysisResult").style.display = "none";
+    if(!hasData){ clearMonthReportOnly(); return; }
+    persistApiConfig();
+    var btn = $("genMonthAnalysisBtn");
+    btn.disabled = true;
+    setMonthReport("呼叫 " + AI_PROVIDERS[creds.provider].label + "（" + creds.model + "）分析中，請稍候…", "warn");
+    try{
+      var prompt = buildMonthAnalysisPrompt(stats);
+      var raw = await callLLM(creds.provider, creds.model, creds.apiKey, prompt, function(attempt, status, waitSec){
+        setMonthReport("API 回應 " + status + "（服務商暫時過載／限流），" + waitSec + " 秒後自動重試（第 " + attempt + "／2 次）…", "warn");
+      });
+      var resultEl = $("monthAnalysisResult");
+      resultEl.textContent = raw.trim();
+      resultEl.style.display = "block";
+      setMonthReport("分析完成", "ok");
+    }catch(e){
+      setMonthReport("分析失敗：" + e.message, "bad");
+    }finally{
+      btn.disabled = false;
+    }
+  }
+  function clearMonthReportOnly(){
+    var el = $("monthAnalysisReport");
+    el.textContent = "";
+    el.className = "report-line";
+  }
+
   /* ================= 備份 / 匯出 ================= */
   async function exportBackup(){
     var entries = await dbListEntries();
@@ -896,11 +1031,13 @@
       this.value = "";
     });
     $("exportCsvBtn").addEventListener("click", exportCsv);
+    $("genMonthAnalysisBtn").addEventListener("click", onGenMonthAnalysis);
   }
 
   function init(){
     initAiPanel();
     bindEvents();
+    $("analysisMonthInput").value = monthKeyLocal(new Date());
     refreshHistory();
   }
   document.addEventListener("DOMContentLoaded", init);
