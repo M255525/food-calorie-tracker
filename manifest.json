@@ -1,6 +1,6 @@
 {
-  "name": "拍照卡路里紀錄",
-  "short_name": "卡路里紀錄",
+  "name": "卡卡日記",
+  "short_name": "卡卡日記",
   "description": "拍一張食物照片，用你自己的 AI 金鑰估算卡路里，紀錄自動存在你的瀏覽器裡",
   "start_url": "./index.html",
   "scope": "./",

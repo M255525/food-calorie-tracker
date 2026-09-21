@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>拍照卡路里紀錄</title>
+<title>卡卡日記</title>
 <meta name="description" content="拍一張食物照片，用你自己的 AI 金鑰估算卡路里，紀錄自動存在你的瀏覽器裡">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#c1502e">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="卡路里紀錄">
+<meta name="apple-mobile-web-app-title" content="卡卡日記">
 <style>
   :root{
     --bg:#fdf7f0; --bg-alt:#f6ebdc; --panel:#ffffff; --panel-raised:#fffaf3;
@@ -40,8 +40,10 @@
     padding:14px 24px;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--line-soft);background:var(--bg-alt);
   }
   body.has-marquee .topbar{top:30px;}
-  .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;}
-  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--tomato);}
+  .brand{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:17px;flex-wrap:wrap;}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--tomato);align-self:center;}
+  .brand-tagline{font-weight:400;font-size:12.5px;color:var(--text-faint);}
+  @media (max-width:480px){ .brand-tagline{display:none;} }
   .topbar a.manual-link{font-size:13px;color:var(--text-dim);text-decoration:none;border:1px solid var(--line);padding:7px 14px;border-radius:6px;}
   .topbar a.manual-link:hover{color:var(--tomato);border-color:var(--tomato);}
   main{max-width:820px;margin:0 auto;padding:28px 20px 80px;}
@@ -132,7 +134,7 @@
 <div id="marqueeBar"><div id="marqueeTrack"></div></div>
 
 <header class="topbar">
-  <div class="brand"><span class="dot"></span><span>🍽️ 拍照卡路里紀錄</span></div>
+  <div class="brand"><span class="dot"></span><span>🍙 卡卡日記</span><span class="brand-tagline">拍照記錄每一餐的卡路里</span></div>
   <a class="manual-link" href="manual.html">📖 操作手冊</a>
 </header>
 
@@ -943,7 +945,7 @@
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url;
-    a.download = "卡路里紀錄備份_" + dateKeyLocal(Date.now()) + ".json";
+    a.download = "卡卡日記備份_" + dateKeyLocal(Date.now()) + ".json";
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -985,7 +987,7 @@
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url;
-    a.download = "卡路里紀錄_" + dateKeyLocal(Date.now()) + ".csv";
+    a.download = "卡卡日記_" + dateKeyLocal(Date.now()) + ".csv";
     document.body.appendChild(a);
     a.click();
     a.remove();
